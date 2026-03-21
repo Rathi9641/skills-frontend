@@ -5,28 +5,29 @@ on:
     branches:
       - main
 
+# ✅ ADD THIS BLOCK (VERY IMPORTANT)
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout
       - uses: actions/checkout@v4
 
-      # 2️⃣ Setup Node
       - uses: actions/setup-node@v4
         with:
           node-version: '18'
 
-      # 3️⃣ Install dependencies
       - name: Install
         run: npm install
 
-      # 4️⃣ Build (IGNORE ESLINT ERRORS ✅)
       - name: Build React App
         run: CI=false npm run build
 
-      # 5️⃣ Azure Login (your existing 3 secrets)
+      # ✅ Azure Login (OIDC)
       - name: Azure Login
         uses: azure/login@v2
         with:
@@ -34,7 +35,6 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_F6A4593FCB8F4AAFA4BE5689D5D429A0 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_7D6E65914067497EAB6307423BA85FB1 }}
 
-      # 6️⃣ Deploy ONLY build folder ✅
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
