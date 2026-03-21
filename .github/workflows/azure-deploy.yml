@@ -1,0 +1,40 @@
+name: Deploy React Frontend to Azure
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout code
+      - uses: actions/checkout@v4
+
+      # 2️⃣ Setup Node
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      # 3️⃣ Install dependencies
+      - run: npm install
+
+      # 4️⃣ Build React app
+      - run: npm run build
+
+      # 5️⃣ Azure Login (using your existing secrets)
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_0A874D2E9FC94543BC90EF8F4037770B }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_F6A4593FCB8F4AAFA4BE5689D5D429A0 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_7D6E65914067497EAB6307423BA85FB1 }}
+
+      # 6️⃣ Deploy build folder (IMPORTANT)
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: skillsfrontend   # your app name
+          package: build             # ✅ React build folder
